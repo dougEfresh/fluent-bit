@@ -28,6 +28,8 @@
 #include <fluent-bit/flb_filter.h>
 #include <fluent-bit/flb_output.h>
 
+#include <fluent-bit/flb_hash.h>
+
 struct calyptia {
     /* config map options */
     flb_sds_t api_key;
@@ -311,6 +313,14 @@ static struct flb_output_instance *setup_cloud_output(struct flb_config *config,
 
     if (ctx->fleet_id) {
         flb_output_set_property(cloud, "fleet_id", ctx->fleet_id);
+        kv = flb_sds_create_size(strlen("fleet_id") + strlen(ctx->fleet_id) + 1);
+        if(!kv) {
+            flb_free(ctx);
+            return NULL;
+        }
+        flb_sds_printf(&kv, "fleet_id %s", ctx->fleet_id);
+        flb_output_set_property(cloud, "add_label", kv);
+        flb_sds_destroy(kv);
     }
 
 #ifdef FLB_HAVE_CHUNK_TRACE
@@ -318,6 +328,59 @@ static struct flb_output_instance *setup_cloud_output(struct flb_config *config,
 #endif /* FLB_HAVE_CHUNK_TRACE */
 
     return cloud;
+}
+
+static flb_sds_t sha256_to_hex(unsigned char *sha256)
+{
+    int i;
+    flb_sds_t hex;
+    flb_sds_t tmp;
+
+    hex = flb_sds_create_size(64);
+    if (!hex) {
+        return NULL;
+    }
+
+    for (i = 0; i < 32; i++) {
+        tmp = flb_sds_printf(&hex, "%02x", sha256[i]);
+        if (!tmp) {
+            flb_sds_destroy(hex);
+            return NULL;
+        }
+        hex = tmp;
+    }
+
+    flb_sds_len_set(hex, 64);
+    return hex;
+}
+
+static flb_sds_t get_machine_id(struct calyptia *ctx)
+{
+    int ret;
+    char *buf;
+    size_t s;
+    unsigned char sha256_buf[64] = {0};
+
+    /* retrieve raw machine id */
+    ret = flb_utils_get_machine_id(&buf, &s);
+    if (ret == -1) {
+        flb_plg_error(ctx->ins, "could not obtain machine id");
+        return NULL;
+    }
+
+    ret = flb_hash_simple(FLB_HASH_SHA256,
+                          (unsigned char *) buf,
+                          s,
+                          sha256_buf,
+                          sizeof(sha256_buf));
+    flb_free(buf);
+
+    if (ret != FLB_CRYPTO_SUCCESS) {
+        return NULL;
+    }
+
+    /* convert to hex */
+    return sha256_to_hex(sha256_buf);
 }
 
 static int cb_calyptia_init(struct flb_custom_instance *ins,
@@ -347,6 +410,16 @@ static int cb_calyptia_init(struct flb_custom_instance *ins,
 
     /* map instance and local context */
     flb_custom_set_context(ins, ctx);
+
+    /* If no machine_id has been provided via a configuration option get it from the local machine-id. */
+    if (!ctx->machine_id) {
+        /* machine id */
+        ctx->machine_id = get_machine_id(ctx);
+        if (ctx->machine_id == NULL) {
+            flb_plg_error(ctx->ins, "unable to retrieve machine_id");
+            return -1;
+        }
+    }
 
     /* input collector */
     ctx->i = flb_input_new(config, "fluentbit_metrics", NULL, FLB_TRUE);
