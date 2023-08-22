@@ -416,6 +416,9 @@ static int cb_calyptia_init(struct flb_custom_instance *ins,
         if (ctx->fleet_config_dir) {
             flb_input_set_property(ctx->fleet, "config_dir", ctx->fleet_config_dir);
         }
+        if (ctx->machine_id) {
+            flb_input_set_property(ctx->fleet, "machine_id", ctx->machine_id);
+        }
     }
 
     if (ctx->o) {
