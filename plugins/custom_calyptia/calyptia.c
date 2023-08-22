@@ -266,7 +266,7 @@ static struct flb_output_instance *setup_cloud_output(struct flb_config *config,
 
             label = flb_sds_create_size(strlen(key->str) + strlen(val->str) + 1);
 
-            if(!label) {
+            if (!label) {
                 flb_free(ctx);
                 return NULL;
             }
@@ -313,14 +313,16 @@ static struct flb_output_instance *setup_cloud_output(struct flb_config *config,
 
     if (ctx->fleet_id) {
         flb_output_set_property(cloud, "fleet_id", ctx->fleet_id);
-        kv = flb_sds_create_size(strlen("fleet_id") + strlen(ctx->fleet_id) + 1);
-        if(!kv) {
+        label = flb_sds_create_size(strlen("fleet_id") + strlen(ctx->fleet_id) + 1);
+
+        if (!label) {
             flb_free(ctx);
             return NULL;
         }
-        flb_sds_printf(&kv, "fleet_id %s", ctx->fleet_id);
-        flb_output_set_property(cloud, "add_label", kv);
-        flb_sds_destroy(kv);
+
+        flb_sds_printf(&label, "fleet_id %s", ctx->fleet_id);
+        flb_output_set_property(cloud, "add_label", label);
+        flb_sds_destroy(label);
     }
 
 #ifdef FLB_HAVE_CHUNK_TRACE
@@ -343,10 +345,12 @@ static flb_sds_t sha256_to_hex(unsigned char *sha256)
 
     for (i = 0; i < 32; i++) {
         tmp = flb_sds_printf(&hex, "%02x", sha256[i]);
+
         if (!tmp) {
             flb_sds_destroy(hex);
             return NULL;
         }
+
         hex = tmp;
     }
 
@@ -363,6 +367,7 @@ static flb_sds_t get_machine_id(struct calyptia *ctx)
 
     /* retrieve raw machine id */
     ret = flb_utils_get_machine_id(&buf, &s);
+
     if (ret == -1) {
         flb_plg_error(ctx->ins, "could not obtain machine id");
         return NULL;
@@ -415,6 +420,7 @@ static int cb_calyptia_init(struct flb_custom_instance *ins,
     if (!ctx->machine_id) {
         /* machine id */
         ctx->machine_id = get_machine_id(ctx);
+
         if (ctx->machine_id == NULL) {
             flb_plg_error(ctx->ins, "unable to retrieve machine_id");
             return -1;
@@ -489,6 +495,7 @@ static int cb_calyptia_init(struct flb_custom_instance *ins,
         if (ctx->fleet_config_dir) {
             flb_input_set_property(ctx->fleet, "config_dir", ctx->fleet_config_dir);
         }
+
         if (ctx->machine_id) {
             flb_input_set_property(ctx->fleet, "machine_id", ctx->machine_id);
         }
