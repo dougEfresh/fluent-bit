@@ -309,6 +309,10 @@ static struct flb_output_instance *setup_cloud_output(struct flb_config *config,
         flb_output_set_property(cloud, "tls.verify", "false");
     }
 
+    if (ctx->fleet_id) {
+        flb_output_set_property(cloud, "fleet_id", ctx->fleet_id);
+    }
+
 #ifdef FLB_HAVE_CHUNK_TRACE
     flb_output_set_property(cloud, "pipeline_id", ctx->pipeline_id);
 #endif /* FLB_HAVE_CHUNK_TRACE */
