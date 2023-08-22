@@ -64,6 +64,7 @@ struct flb_in_calyptia_fleet_config {
     flb_sds_t api_key;
     flb_sds_t fleet_id;
     flb_sds_t fleet_name;
+    flb_sds_t machine_id;
     flb_sds_t config_dir;
     flb_sds_t cloud_host;
     flb_sds_t cloud_port;
@@ -1009,6 +1010,11 @@ static struct flb_config_map config_map[] = {
      FLB_CONFIG_MAP_STR, "fleet_name", NULL,
      0, FLB_TRUE, offsetof(struct flb_in_calyptia_fleet_config, fleet_name),
      "Calyptia Fleet Name (used to lookup the fleet ID via the cloud API)."
+    },
+    {
+     FLB_CONFIG_MAP_STR, "machine_id", NULL,
+     0, FLB_TRUE, offsetof(struct flb_in_calyptia_fleet_config, machine_id),
+     "Agent Machine ID."
     },
     {
       FLB_CONFIG_MAP_INT, "event_fd", "-1",
