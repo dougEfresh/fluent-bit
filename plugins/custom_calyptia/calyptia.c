@@ -334,7 +334,7 @@ static struct flb_output_instance *setup_cloud_output(struct flb_config *config,
 
 static flb_sds_t sha256_to_hex(unsigned char *sha256)
 {
-    int i;
+    int idx;
     flb_sds_t hex;
     flb_sds_t tmp;
 
@@ -344,8 +344,8 @@ static flb_sds_t sha256_to_hex(unsigned char *sha256)
         return NULL;
     }
 
-    for (i = 0; i < 32; i++) {
-        tmp = flb_sds_printf(&hex, "%02x", sha256[i]);
+    for (idx = 0; idx < 32; idx++) {
+        tmp = flb_sds_printf(&hex, "%02x", sha256[idx]);
 
         if (!tmp) {
             flb_sds_destroy(hex);
