@@ -844,12 +844,12 @@ conn_error:
 //   http://nion.modprobe.de/blog/archives/357-Recursive-directory-creation.html
 static int _mkdir(const char *dir, int perms) {
     char tmp[255];
-    char *p = NULL;
+    char *ptr = NULL;
     size_t len;
-    int rc;
+    int ret;
 
-    rc = snprintf(tmp, sizeof(tmp),"%s",dir);
-    if (rc > sizeof(tmp)) {
+    ret = snprintf(tmp, sizeof(tmp),"%s",dir);
+    if (ret > sizeof(tmp)) {
         return -1;
     }
 
@@ -858,16 +858,16 @@ static int _mkdir(const char *dir, int perms) {
         tmp[len - 1] = 0;
     }
 
-    for (p = tmp + 1; *p; p++) {
-        if (*p == '/') {
-            *p = 0;
+    for (ptr = tmp + 1; *ptr; ptr++) {
+        if (*ptr == '/') {
+            *ptr = 0;
             if (access(tmp, F_OK) != 0) {
-                rc = mkdir(tmp, perms);
-                if (rc != 0) {
-                    return rc;
+                ret = mkdir(tmp, perms);
+                if (ret != 0) {
+                    return ret;
                 }
             }
-            *p = '/';
+            *ptr = '/';
         }
     }
     return mkdir(tmp, perms);
