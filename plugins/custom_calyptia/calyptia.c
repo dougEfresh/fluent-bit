@@ -363,11 +363,11 @@ static flb_sds_t get_machine_id(struct calyptia *ctx)
 {
     int ret;
     char *buf;
-    size_t s;
+    size_t blen;
     unsigned char sha256_buf[64] = {0};
 
     /* retrieve raw machine id */
-    ret = flb_utils_get_machine_id(&buf, &s);
+    ret = flb_utils_get_machine_id(&buf, &blen);
 
     if (ret == -1) {
         flb_plg_error(ctx->ins, "could not obtain machine id");
@@ -376,7 +376,7 @@ static flb_sds_t get_machine_id(struct calyptia *ctx)
 
     ret = flb_hash_simple(FLB_HASH_SHA256,
                           (unsigned char *) buf,
-                          s,
+                          blen,
                           sha256_buf,
                           sizeof(sha256_buf));
     flb_free(buf);
