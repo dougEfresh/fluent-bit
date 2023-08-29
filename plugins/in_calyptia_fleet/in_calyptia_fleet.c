@@ -182,7 +182,8 @@ static flb_sds_t fleet_config_filename(struct flb_in_calyptia_fleet_config *ctx,
         flb_sds_printf(&cfgname,
                        "%s" PATH_SEPARATOR "%s" PATH_SEPARATOR "%s" PATH_SEPARATOR "%s.ini",
                        ctx->config_dir, ctx->machine_id, ctx->fleet_name, fname);
-    } else {
+    }
+    else {
         flb_sds_printf(&cfgname,
                        "%s" PATH_SEPARATOR "%s" PATH_SEPARATOR "%s" PATH_SEPARATOR "%s.ini",
                        ctx->config_dir, ctx->machine_id, ctx->fleet_id, fname);
@@ -758,7 +759,8 @@ static int in_calyptia_fleet_collect(struct flb_input_instance *ins,
                         ctx->ins->host.port,
                         tls_setting_string(ctx->ins->use_tls)
             );
-        } else {
+        }
+        else {
             hdr = flb_sds_printf(&header,
                         "[CUSTOM]\n"
                         "    Name          calyptia\n"
@@ -886,7 +888,8 @@ static int create_fleet_directory(struct flb_in_calyptia_fleet_config *ctx)
     if (ctx->fleet_name != NULL) {
         flb_sds_printf(&myfleetdir, "%s" PATH_SEPARATOR "%s" PATH_SEPARATOR "%s",
                        ctx->config_dir, ctx->machine_id, ctx->fleet_name);
-    } else {
+    }
+    else {
         flb_sds_printf(&myfleetdir, "%s" PATH_SEPARATOR "%s" PATH_SEPARATOR "%s",
                        ctx->config_dir, ctx->machine_id, ctx->fleet_id);
     }
