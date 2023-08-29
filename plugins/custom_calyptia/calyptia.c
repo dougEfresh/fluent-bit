@@ -339,6 +339,7 @@ static flb_sds_t sha256_to_hex(unsigned char *sha256)
     flb_sds_t tmp;
 
     hex = flb_sds_create_size(64);
+
     if (!hex) {
         return NULL;
     }
