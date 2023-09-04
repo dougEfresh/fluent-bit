@@ -377,6 +377,8 @@ if (FLB_WASM)
   REGISTER_FILTER_PLUGIN("filter_wasm")
 endif ()
 
+REGISTER_FILTER_PLUGIN("filter_docker_meta")
+
 # Register external input and output plugins
 if(EXT_IN_PLUGINS)
   string(REPLACE "," ";" plugins ${EXT_IN_PLUGINS})
