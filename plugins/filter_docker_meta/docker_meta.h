@@ -25,20 +25,19 @@
  */
 #define FLB_MERGE_BUF_SIZE  2048  /* 2KB */
 
+#define FLB_DOCKER_FILTER_PATH_FORMAT "%s/%s/config.v2.json"
 
-struct filter_docker_ctx
+struct flb_filter_docker
 {
-    int rules_cnt;
     struct flb_filter_instance *ins;
     struct flb_hash_table *hash_table;
+    flb_sds_t docker_dir;
 };
 
 struct flb_docker_meta
 {
-    char *container_id;
-    size_t container_id_len;
-    char *container_name;
-    size_t container_name_len;
+    const char *container_name;
+    int container_name_len;
 };
 
 #endif /* FLB_FILTER_DOCKER_META_H */
